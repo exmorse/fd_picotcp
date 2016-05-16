@@ -2,13 +2,20 @@ COMPILE_PICOTCP=picotcp/build/modules/pico_dev_vde.o
 INCLUDE_FD_PICOTCP=-I ./ 
 INCLUDE_PICOTCP=-I picotcp/build/include
 
-all: libfdpicotcp.a
+all: libfdpicotcp.so libfdpicotcp.a
+	rm libpicotcp.a
+
+libfdpicotcp.so: fd_picotcp.o device.o fd_functions.o socket.o
+	cp picotcp/build/lib/libpicotcp.a ./
+	ar x libpicotcp.a 
+	gcc -shared -o libfdpicotcp.so *.o  
+	rm *.o libpicotcp.a 
 
 libfdpicotcp.a: fd_picotcp.o device.o fd_functions.o socket.o
 	cp picotcp/build/lib/libpicotcp.a ./
 	ar x libpicotcp.a 
 	ar rcs libfdpicotcp.a *.o $(COMPILE_PICOTCP) picotcp/build/lib/libpicotcp.a
-	rm *.o 
+	rm *.o
 
 fd_picotcp.o: fd_picotcp.c fd_picotcp.h
 	$(CC) $(CFLAGS) -c -fPIC fd_picotcp.c $(INCLUDE_PICOTCP) $(INCLUDE_FD_PICOTCP) 
@@ -23,4 +30,4 @@ socket.o: socket.c
 	$(CC) $(CFLAGS) -c -fPIC socket.c $(INCLUDE_PICOTCP) $(INCLUDE_FD_PICOTCP) 
 
 clean:
-	rm libfdpicotcp.a fd_picotcp.o device.o fd_functions.o socket.o 
+	rm libfdpicotcp.a libfdpicotcp.so

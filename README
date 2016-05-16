@@ -6,8 +6,8 @@ simultaneously on picotcp sockets and kernel sockets.
 
 Compiling fd_picotcp:
 	- move to src/picotcp 
-	- run "make" 
-	- run "make test"
+	- run "make posix core ARCH=shared" 
+	- run "make test ARCH=shared"
 	- move back to src/ and run "make" 
 
 
