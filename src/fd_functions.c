@@ -23,6 +23,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <pico_stack.h>
+#include <pico_dev_vde.h>
+#include <pico_socket.h>
+#include <pico_ipv6.h>
+
 #include <sys/stat.h>
 
 #include <semaphore.h>

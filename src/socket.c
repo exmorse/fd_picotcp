@@ -28,6 +28,11 @@
 
 #include <sys/syscall.h>
 
+#include <pico_stack.h>
+#include <pico_dev_vde.h>
+#include <pico_socket.h>
+#include <pico_ipv6.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 

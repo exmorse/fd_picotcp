@@ -1,9 +1,6 @@
 #include <sys/stat.h>
-#include <pico_stack.h>
-#include <pico_dev_vde.h>
-#include <pico_socket.h>
-#include <pico_ipv6.h>
 #include <semaphore.h>
+#include <inttypes.h>
 
 #ifndef AF_PICO_INET 
 	#define AF_PICO_INET 1018
