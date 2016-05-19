@@ -40,6 +40,15 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifndef AF_PICO_INET 
+        #define AF_PICO_INET 1018
+#endif
+
+#ifndef AF_PICO_INET6 
+        #define AF_PICO_INET6 1019
+#endif
+
+
 ssize_t read(int fd, void* buf, size_t len) {
 	if (get_socket_from_fd(fd) != NULL) {
 		return fd_pico_socket_read(fd, buf, len);
