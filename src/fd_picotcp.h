@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include <semaphore.h>
 #include <inttypes.h>
+#include <libvdeplug.h>
 
 #ifndef AF_PICO_INET 
 	#define AF_PICO_INET 1018

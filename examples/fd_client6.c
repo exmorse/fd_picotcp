@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
 	err = bind(cfd, (struct sockaddr*)&local, sizeof(local));
 	if (err == -1) {
-		printf("MAIN BIND: %s\n", strerror(pico_err));
+		printf("BIND ERROR\n");
 	}
 
 	server.sin6_family = AF_INET6;
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	
 	err = connect(cfd, (struct sockaddr*)&server, sizeof(server));
 	if (err == -1) {
-		printf("%s\n", strerror(pico_err));
+		printf("CONNECT ERROR\n");
 	}
 
 	while(1) {

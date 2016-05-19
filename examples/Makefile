@@ -1,6 +1,6 @@
 INCLUDE_FD_PICOTCP=-I ../src -L ../src -lfdpicotcp
-INCLUDE_PICOTCP=-I ../src/picotcp/build/include/ -L ../src/picotcp/build/lib 
-LINK_FLAGS=-ldl -lvdeplug -lpthread
+#INCLUDE_PICOTCP=-I ../src/picotcp/build/include/ -L ../src/picotcp/build/lib 
+LINK_FLAGS=-ldl -lpthread
 
 all: fd_server fd_client fd_server6 fd_client6 
 

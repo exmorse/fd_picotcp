@@ -39,13 +39,13 @@ int main(int argc, char* argv[]) {
 
 	err = bind(sfd1, (struct sockaddr*)&local, sizeof(local));	
 	if (err == -1) {
-		printf("BIND %s\n", strerror(pico_err));
+		printf("BIND ERROR\n");
 		return 1;
 	}
 
 	err = listen(sfd1, 3);
 	if (err == -1) {
-		printf("%s\n", strerror(pico_err));
+		printf("LISTEN ERROR\n");
 		return 1;
 	}
 

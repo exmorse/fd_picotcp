@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	local.sin_addr.s_addr = inet_addr(argv[1]);
 	err = bind(cfd, (struct sockaddr*)&local, sizeof(local));
 	if (err == -1) {
-		printf("BIND: %s\n", strerror(pico_err));
+		printf("BIND ERROR\n");
 	}
 
 	server.sin_family = AF_INET;
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	server.sin_addr.s_addr = inet_addr(argv[2]);
 	err = connect(cfd, (struct sockaddr*)&server, sizeof(server));
 	if (err == -1) {
-		printf("%s\n", strerror(pico_err));
+		printf("CONNECT ERROR\n");
 	}
 
 	while(1) {

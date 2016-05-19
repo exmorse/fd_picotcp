@@ -8,7 +8,7 @@ all: libfdpicotcp.so libfdpicotcp.a
 libfdpicotcp.so: fd_picotcp.o device.o fd_functions.o socket.o
 	cp picotcp/build/lib/libpicotcp.a ./
 	ar x libpicotcp.a 
-	gcc -shared -o libfdpicotcp.so *.o  
+	gcc -shared -o libfdpicotcp.so *.o -lvdeplug -ldl -lpthread 
 	rm *.o libpicotcp.a 
 
 libfdpicotcp.a: fd_picotcp.o device.o fd_functions.o socket.o
