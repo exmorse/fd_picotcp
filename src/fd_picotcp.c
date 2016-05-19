@@ -9,6 +9,7 @@
 #define _GNU_SOURCE
 
 #include "fd_picotcp.h"
+#include "fd_methods.h"
 
 #include <stdio.h>
 #include <stdlib.h>
