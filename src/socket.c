@@ -118,7 +118,7 @@ int bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		struct sockaddr_in* local = (struct sockaddr_in*)addr;
 		char * addr_string = inet_ntoa(local->sin_addr);
 		if (addr_string == NULL) {
-			fprintf(stderr, "Error handling address\n");
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}	
 		return fd_pico_socket_bind(fd, addr_string, local->sin_port);
@@ -131,7 +131,7 @@ int bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		inet_ntop(AF_INET6, &local->sin6_addr, addr_string, addrlen);
 	
 		if (addr_string == NULL) {
-			fprintf(stderr, "Error handling address\n");
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}		
 
@@ -151,7 +151,7 @@ int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		struct sockaddr_in* local = (struct sockaddr_in*)addr;
 		char * addr_string = inet_ntoa(local->sin_addr);
 		if (addr_string == NULL) {
-			fprintf(stderr, "Error handling address\n");
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}	
 		return fd_pico_socket_connect(fd, addr_string, local->sin_port);
@@ -164,7 +164,7 @@ int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		inet_ntop(AF_INET6, &local->sin6_addr, addr_string, addrlen);
 	
 		if (addr_string == NULL) {
-			fprintf(stderr, "Error handling address\n");
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}		
 		

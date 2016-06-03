@@ -10,6 +10,7 @@
 
 #include "fd_picotcp.h"
 #include "fd_methods.h"
+#include "fd_errors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +32,16 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
 #include <time.h>
+
+int FD_TABLE_SIZE = 8;
+int MAX_FD;
 
 /* Default VDE values */
 char vde_switch_name[256] = "/tmp/vde.ctl";
@@ -48,7 +54,10 @@ struct pico_device *pico_dev;
 
 /* Array of pointer to fd_elem */
 /* Used to store the active sockets */
-fd_elem* fd_table[FD_TABLE_SIZE];
+fd_elem** fd_table;
+
+/* Status of last fd_picotcp function called */
+int fd_err = FD_OK;
 
 /* Function to tick picotcp stack */
 /* Used as a thread */
@@ -59,9 +68,25 @@ void* fd_pico_stack_loop() {
 	}
 }
 
+void _print_stats() {
+	int i;
+	for (i = 0; i < FD_TABLE_SIZE; i++) {
+		if (fd_table[i] == NULL) printf("Pos: %d\t - NULL\n", i);
+		else printf("Pos: %d\t - %d\n", i, (int)(fd_table[i]->fd[0]));
+	}
+}
+
 void init() {
         struct pico_ip4 my_ip, netmask;
 	int err, i;
+
+	/* Allocate fd_elem dynamic array */
+	fd_table = (fd_elem**) malloc(FD_TABLE_SIZE * sizeof(fd_elem*));
+
+	/* Get max number of file descriptor per process */
+	struct rlimit l;
+	getrlimit(RLIMIT_NOFILE, &l);
+	MAX_FD = l.rlim_cur;
 
 	/* picotcp initializer */
 	pico_stack_init();
@@ -88,9 +113,9 @@ void init() {
 	pthread_t t;
 	err = pthread_create(&t, NULL, fd_pico_stack_loop, NULL);	
 	if (err == -1) {
-		perror("THREAD");
+		fd_err = FD_THREAD_ERROR;
 	}
-	return ;
+	return;
 }
 
 /* Callback function for every picotcp socket */
@@ -103,7 +128,7 @@ void handle_wakeup(uint16_t ev, struct pico_socket* socket) {
 	/* Connection on socket */
 	if (ev & PICO_SOCK_EV_CONN) {
 		if (l == NULL) {
-			fprintf(stderr, "List Element not found\n");
+			fd_err = FD_SOCKET_NOT_FOUND;
 			return;
 		}
 		/* Unlock on accept semaphore */
@@ -113,7 +138,7 @@ void handle_wakeup(uint16_t ev, struct pico_socket* socket) {
 	/* Something to read on socket */
 	if (ev & PICO_SOCK_EV_RD) {
 		if (l == NULL) {
-			fprintf(stderr, "List Element not found\n");
+			fd_err = FD_SOCKET_NOT_FOUND;
 			return;
 		}
 		
@@ -170,13 +195,12 @@ int isIpv6(char* address) {
 /* The following are the function used to manipulate fd_table  */
 /*-------------------------------------------------------------*/
 
-/* TODO if fd is greater than fd_table size */ 
 int fd_elem_create(int fd[2], struct pico_socket* socket) {
 	int e = 0;
 	fd_elem* l = (fd_elem*)malloc(sizeof(fd_elem));
 	
 	if (l == NULL) {
-		fprintf(stderr, "Error allocating fd_elem\n");
+		fd_err = FD_ELEM_NOT_ALLOCATED;
 		return -1;
 	}
 
@@ -190,7 +214,7 @@ int fd_elem_create(int fd[2], struct pico_socket* socket) {
 	l->read_sem = (sem_t*) malloc(sizeof(sem_t));
 
 	if (l->accept_sem == NULL || l->read_sem == NULL) {
-		fprintf(stderr, "Error allocating semaphores\n");
+		fd_err = FD_SEM_NOT_ALLOCATED;
 		return -1;
 	}
 	
@@ -208,18 +232,34 @@ int fd_elem_create(int fd[2], struct pico_socket* socket) {
 	
 	l->socket = socket;
 
-	if (fd[0] >= FD_TABLE_SIZE) {
-		fprintf(stderr, "fd_table size exceeded\n");
-		return -1;
+	if (fd[0] >= FD_TABLE_SIZE || fd[1] >= FD_TABLE_SIZE) {
+		/* Try to duplicate table size */
+		/* If table size has reached max then abort */
+		if (2*FD_TABLE_SIZE > MAX_FD) {
+			fd_err = FD_TABLE_MAX_SIZE_REACHED;
+			return -1;
+		}
+
+		/* Else duplicate fd_table size */
+		fd_elem** new_table = (fd_elem**) malloc(2*FD_TABLE_SIZE*sizeof(fd_elem*));
+		if (new_table == NULL) {
+			return -1;
+		}
+		int j;
+		for (j = 0; j < FD_TABLE_SIZE; j++) new_table[j] = fd_table[j];		
+		for (j = FD_TABLE_SIZE; j < 2*FD_TABLE_SIZE; j++) new_table[j] = NULL;
+		FD_TABLE_SIZE = 2*FD_TABLE_SIZE;
+		free(fd_table);
+		fd_table = new_table;
 	}
 
 	if (fd_table[fd[0]] != NULL) {
-		fprintf(stderr, "Writing on cell not null\n");
+		fd_err = FD_TABLE_WRITE_ON_NOT_NULL;
 		return -1;
 	}
-	
-	fd_table[fd[0]] = l;
 
+	if (fd_table==NULL) printf("IS NULL\n");
+	fd_table[fd[0]] = l;
 	/* Returns the file descriptor */
 	return fd[0];
 }

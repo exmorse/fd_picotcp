@@ -11,8 +11,6 @@
 	#define AF_PICO_INET6 1019
 #endif
 
-#define FD_TABLE_SIZE 1024
-
 /* Struct that associates a picotcp socket to a file descriptor 	*/
 /* When a new fd_elem is created, fd[0] is returned, and will be used as
    key to identify the corresponding fd_elem 				*/
@@ -24,3 +22,7 @@ typedef struct s_fd_elem_t {
 	sem_t* read_sem;	/* Read-Write semaphore */
 	struct pico_socket* socket;	/* picotcp socket */
 } fd_elem;
+
+void _print_stats();
+
+void perror();

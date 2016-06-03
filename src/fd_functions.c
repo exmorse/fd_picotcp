@@ -54,20 +54,20 @@ int fd_pico_socket_open(uint16_t net, uint16_t proto) {
 
 	s = pico_socket_open(net, proto, handle_wakeup);
 	if (s == NULL) {
-		fprintf(stderr, "Null socket\n");
+		fd_err = FD_SOCKET_IS_NULL;
 		return -1;
 	}
 
 	err = pipe(pipefd);
 	if (err == -1) {
-		perror("Pipe");
+		fd_err = FD_PIPE_NOT_INITIALIZED;
 		return -1;
 	}
 
 	/* Create new fd_picotcp socket struct, using pipe and picotcp socket */
 	new_fd = fd_elem_create(pipefd, s);
 	if (new_fd < 0) {
-		fprintf(stderr, "Error inserting in table\n");
+		//fd_err = FD_TABLE_INSERT_ELEMENT;
 		return -1;
 	}
 
@@ -89,7 +89,7 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 	/* Get picotcp socket */
 	s = get_socket_from_fd(fd);
 	if (s == NULL) {
-		fprintf(stderr, "FD_BIND: socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}
 
@@ -97,13 +97,13 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 	if (isIpv4(address)) {
 		err = pico_string_to_ipv4(address, &ip_address.addr);
 		if (err == -1) {
-			fprintf(stderr, "STRING TO IPV4: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}
 		
 		err = pico_string_to_ipv4(ipv4_mask_string, &netmask.addr);
 		if (err == -1) {
-			fprintf(stderr, "STRING (netmask) TO IPV4: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_NETMASK;
 			return -1;
 		}
 	
@@ -111,7 +111,7 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 			/* Add interface to device */	
 			err = pico_ipv4_link_add(pico_dev, ip_address, netmask);
 			if (err == -1) { 
-				fprintf(stderr, "IPV4 LINK ADD: %s\n", strerror(pico_err));
+				fd_err = FD_INTERFACE_NOT_LINKED;
 				return -1;
 			}
 		}
@@ -123,13 +123,13 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 	else if (isIpv6(address)) {
 		err = pico_string_to_ipv6(address, ip6_address.addr);
 		if (err == -1) {
-			fprintf(stderr, "STRING TO IPV6: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}
 	
 		err = pico_string_to_ipv6(ipv6_mask_string, ip6_netmask.addr);
 		if (err == -1) {
-			fprintf(stderr, "STRING (netmask) TO IPV6: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_NETMASK;
 			return -1;
 		}
 
@@ -137,7 +137,7 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 			/* Add interface to device */	
 			link6 = pico_ipv6_link_add(pico_dev, ip6_address, ip6_netmask);
 			if (link6 == NULL) { 
-				fprintf(stderr, "IPV6 LINK ADD: %s\n", strerror(pico_err));
+				fd_err = FD_INTERFACE_NOT_LINKED;
 				return -1;
 			}
 		}
@@ -146,7 +146,10 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 		/* A timeout of 3 seconds is set, if it takes longer returns -1 */
 		time_t start_time = time(NULL);
 		while (pico_ipv6_link_find(&ip6_address) == NULL) {
-			if (time(NULL) - start_time >= 3) return -1;
+			if (time(NULL) - start_time >= 3) {
+				fd_err = FD_INTERFACE_NOT_LINKED;
+				return -1;
+			}
 			usleep(1000);
 		}
 
@@ -154,7 +157,7 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 	}
 
 	else {
-		fprintf(stderr, "Invalid Address\n");
+		fd_err = FD_INVALID_ADDRESS;
 		return -1;
 	}
 
@@ -165,7 +168,7 @@ int fd_pico_socket_listen(int fd, int backlog) {
 
 	s = get_socket_from_fd(fd);
 	if (s == NULL) {
-		fprintf(stderr, "Listen - socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}
 
@@ -182,7 +185,7 @@ int fd_pico_socket_connect(int fd, char* address, uint16_t port) {
 	l = get_fd_elem_from_fd(fd);
 	s = get_socket_from_fd(fd);
         if (s == NULL) {
-                fprintf(stderr, "FD_BIND: socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
                 return -1;
         }
 
@@ -190,7 +193,7 @@ int fd_pico_socket_connect(int fd, char* address, uint16_t port) {
 	if (!l->isIpv6) {
 		err = pico_string_to_ipv4(address, &ip_address.addr);
         	if (err == -1) {
-                	fprintf(stderr, "FD_BIND: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_ADDRESS;
                 	return -1;
         	}
 	
@@ -201,7 +204,7 @@ int fd_pico_socket_connect(int fd, char* address, uint16_t port) {
 	else {
 		err = pico_string_to_ipv6(address, ip6_address.addr);
         	if (err == -1) {
-                	fprintf(stderr, "FD_BIND: %s\n", strerror(pico_err));
+			fd_err = FD_INVALID_ADDRESS;
                 	return -1;
         	}
 	
@@ -221,7 +224,7 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 	int err, new_fd;
 
 	if (l == NULL) {	
-		fprintf(stderr, "Accept - socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}
 	
@@ -232,7 +235,7 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 	if (!l->isIpv6) {
 		c = pico_socket_accept(l->socket, &ip_address, &s_port);
 		if (c == NULL) {
-			fprintf(stderr, "Accept - socket returned is null\n");
+			fd_err = FD_SOCKET_IS_NULL;
 			return -1;
 		}
 		pico_ipv4_to_string(str_addr, ip_address.addr);
@@ -242,7 +245,7 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 	else if (l->isIpv6) {
 		c = pico_socket_accept(l->socket, &ip6_address, &s_port);
 		if (c == NULL) {
-			fprintf(stderr, "Accept - socket returned is null\n");
+			fd_err = FD_SOCKET_IS_NULL;
 			return -1;
 		}
 		pico_ipv6_to_string(str_addr, ip6_address.addr);
@@ -255,7 +258,6 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 	new_fd = fd_elem_create(pipefd, c);
 
 	if (new_fd < 0) {
-		fprintf(stderr, "Errore creating accepted socket\n");
 		return -1;
 	}	
 
@@ -273,7 +275,7 @@ int fd_pico_socket_write(int fd, const void* buffer, int len) {
 	
 	l = get_fd_elem_from_fd(fd);
 	if (l == NULL) {
-		fprintf(stderr, "Write - socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}
 
@@ -286,7 +288,7 @@ int fd_pico_socket_read(int fd, char* buffer, int len) {
 
 	l = get_fd_elem_from_fd(fd);
 	if (l == NULL) {
-		fprintf(stderr, "Read - socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}	
 
@@ -311,7 +313,7 @@ int fd_pico_socket_close(int fd) {
 	
 	s = get_socket_from_fd(fd);
 	if (s == NULL) {		
-		fprintf(stderr, "Close - socket not found\n");
+		fd_err = FD_SOCKET_NOT_FOUND;
 		return -1;
 	}
 
