@@ -14,7 +14,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
 int main(int argc, char* argv[]) {
 	int sfd1;
 	int cfd1;
@@ -34,6 +33,7 @@ int main(int argc, char* argv[]) {
 	sfd1 = socket(AF_PICO_INET, SOCK_STREAM, 0);
 	if (sfd1 == -1) {
 		printf("Error in Open");
+		fd_perror();
 		return 1;
 	}
 

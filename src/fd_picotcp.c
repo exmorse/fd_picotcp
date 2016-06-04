@@ -106,6 +106,7 @@ void init() {
 	sprintf(pid_string, "%d", getpid());
 	strcat(device_name, pid_string);
 
+	/* Create picotcp device */
         pico_dev = (struct pico_device *) 
 			pico_vde_create(vde_switch_name, device_name, macaddr);
 
