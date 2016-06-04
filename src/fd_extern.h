@@ -17,3 +17,5 @@ extern int FD_TABLE_SIZE;
 extern fd_elem** fd_table;
 
 extern int fd_err;
+
+extern int device_type;

@@ -9,7 +9,7 @@
 #define _GNU_SOURCE
 
 #include "fd_picotcp.h"
-#include "fd_methods.h"
+#include "fd_functions.h"
 #include "fd_errors.h"
 
 #include <stdio.h>
@@ -51,6 +51,10 @@ char ipv4_mask_string[16] = "255.255.255.0";
 char ipv6_mask_string[100] = "::";
 int is_mac_changed = 0;
 struct pico_device *pico_dev;
+
+/* Type of picotcp device to create */
+/* Set to VDE by default */
+int device_type = DEVICE_VDE;
 
 /* Array of pointer to fd_elem */
 /* Used to store the active sockets */
@@ -107,8 +111,19 @@ void init() {
 	strcat(device_name, pid_string);
 
 	/* Create picotcp device */
-        pico_dev = (struct pico_device *) 
-			pico_vde_create(vde_switch_name, device_name, macaddr);
+	switch (device_type) {
+		case DEVICE_VDE:
+        		pico_dev = (struct pico_device*) 
+				pico_vde_create(vde_switch_name, device_name, macaddr);
+			break;
+	
+		case DEVICE_TAP:
+			pico_dev = (struct pico_device*) pico_tap_create(vde_switch_name);
+			break;
+	
+		default:
+			return;
+	}
 
 	/* Launch thread to tick picotcp stack */
 	pthread_t t;

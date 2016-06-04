@@ -11,6 +11,10 @@
 	#define AF_PICO_INET6 1019
 #endif
 
+#define DEVICE_VDE 1
+#define DEVICE_TAP 2
+#define DEVICE_TUN 3  
+
 /* Struct that associates a picotcp socket to a file descriptor 	*/
 /* When a new fd_elem is created, fd[0] is returned, and will be used as
    key to identify the corresponding fd_elem 				*/

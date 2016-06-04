@@ -15,7 +15,7 @@
 
 #include "fd_picotcp.h"
 #include "fd_extern.h"
-#include "fd_methods.h"
+#include "fd_functions.h"
 
 #include <stdio.h>
 #include <stdlib.h>
