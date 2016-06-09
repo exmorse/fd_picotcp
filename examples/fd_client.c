@@ -25,6 +25,9 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
+	set_device_type(DEVICE_TAP);
+	set_interface_name("tap10");
+
 	cfd = socket(AF_PICO_INET, SOCK_STREAM, 0);
 
 	local.sin_family = AF_INET;

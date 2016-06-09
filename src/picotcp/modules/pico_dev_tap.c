@@ -89,13 +89,16 @@ static int tap_open(char *name)
     struct ifreq ifr;
     int tap_fd;
     if((tap_fd = open("/dev/net/tun", O_RDWR)) < 0) {
-        return(-1);
+        dbg("Error opening /dev/net/tun\n");
+	return(-1);
     }
 
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     strncpy(ifr.ifr_name, name, IFNAMSIZ);
     if(ioctl(tap_fd, TUNSETIFF, &ifr) < 0) {
+        dbg("Error setting ioctl\n");
+	perror("IOCTL");
         return(-1);
     }
 

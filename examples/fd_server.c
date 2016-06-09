@@ -30,6 +30,9 @@ int main(int argc, char* argv[]) {
 	local.sin_port = htons(atoi(argv[2]));
 	local.sin_addr.s_addr = inet_addr(argv[1]);
 
+	set_device_type(DEVICE_TAP);
+	set_interface_name("tap0");
+
 	sfd1 = socket(AF_PICO_INET, SOCK_STREAM, 0);
 	if (sfd1 == -1) {
 		printf("Error in Open");

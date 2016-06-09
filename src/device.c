@@ -48,11 +48,11 @@ int set_device_type(int type){
 			break;
 
 		case DEVICE_TAP:
-			set_interface_name("tap1");
+			set_interface_name("tap");
 			break;
 
 		case DEVICE_TUN:
-			set_interface_name("tun0");
+			set_interface_name("tun");
 			break;
 
 		default:

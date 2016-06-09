@@ -121,6 +121,10 @@ void init() {
 			pico_dev = (struct pico_device*) pico_tap_create(vde_switch_name);
 			break;
 	
+		case DEVICE_TUN:
+			pico_dev = (struct pico_device*) pico_tun_create(vde_switch_name);
+			break;
+	
 		default:
 			return;
 	}
