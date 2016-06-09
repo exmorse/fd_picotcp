@@ -22,7 +22,7 @@ Compiling fd_picotcp:
 	```	
 
 
-Writing program using fd_picotcp:
+Writing programs using fd_picotcp:
 ---------------------------------
 
 - include ```<fd_picotcp.h>```
@@ -41,13 +41,29 @@ Writing program using fd_picotcp:
   descriptor returned by ```socket()```
 
 
-Compiling program using fd_picotcp:
+Compiling programs using fd_picotcp:
 -----------------------------------
-Run gcc with the following flags:
+ Compiling with the static ```libfdpicotcp.a```:
+ --------------
+ Run gcc with the following flags:
 
-	-I PATH/TO/FD_PICOTCP/src -L PATH/TO/FD_PICOTCP/src 
+	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/static_lib -lfdpicotcp
 
-	-ldl -lpthread -lfdpicotcp
+	-ldl -lpthread -lvdeplug
+	
+Compiling with the shared ```libfdpicotcp.so```:
+ --------------
+ Run gcc with the following flags:
+
+	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/shared_lib -lfdpicotcp
+
+	-ldl -lpthread -lvdeplug
+
+then add the path to the shared object to ```LD_LIBRARY_PATH``` before launching executables:
+
+	  LD_LIBRARY_PATH=./PATH/TO/FDPICOTCP/shared_lib
+
+	  export LD_LIBRARY_PATH
 
 
 Examples:
