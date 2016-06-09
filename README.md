@@ -43,17 +43,15 @@ Writing programs using fd_picotcp:
 
 Compiling programs using fd_picotcp:
 -----------------------------------
- Compiling with the static ```libfdpicotcp.a```:
- --------------
- Run gcc with the following flags:
+####Compiling with the static ```libfdpicotcp.a```:
+Run gcc with the following flags:
 
 	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/static_lib -lfdpicotcp
 
 	-ldl -lpthread -lvdeplug
 	
-Compiling with the shared ```libfdpicotcp.so```:
- --------------
- Run gcc with the following flags:
+####Compiling with the shared ```libfdpicotcp.so```:
+Run gcc with the following flags:
 
 	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/shared_lib -lfdpicotcp
 
