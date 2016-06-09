@@ -27,9 +27,9 @@ Writing program using fd_picotcp:
 
 - include ```<fd_picotcp.h>```
 
-- customize the VDE environment using ```set_device_mac()```, ```set_switch_path()```, 
-  ```set_ipv4_netmask()```, and ```set_ipv6_netmask()``` before creating any fd_picotcp
-  sockets 
+- customize device (vde, tap or tun) and environment using ```set_device_type()```, ```set_device_mac()```,
+  ```set_interface_name()```, ```set_switch_path()```,  ```set_ipv4_netmask()```, and ```set_ipv6_netmask()``` 
+  before creating any fd_picotcp  sockets 
   (NOT NECESSARY, default values are set)
 
 - create fd_picotcp sockets using ```socket()```, with  ```AF_PICO_INET``` or ```AF_PICO_INET6```
@@ -55,7 +55,19 @@ Examples:
 Very basic application showing how to write and compile a program with fd_picotcp.
 
 - move to examples/ directory
-- run ```make``` to compile the examples
+- run ```make``` to compile the examples 
+	* the default Makefile uses the static libfdpicotcp.a library, to compile 
+  	  with the shared libfdpicotcp.so use 
+	  
+	  ```make -f Makefile_so```
+	
+	  then run:
+	  ```	
+	  LD_LIBRARY_PATH=./PATH/TO/FDPICOTCP/shared_lib
+
+	  export LD_LIBRARY_PATH
+	  ```
+		
 - launch a VDE switch in a new terminal with the command ```vde_switch```
 - launch the server:
 	```
