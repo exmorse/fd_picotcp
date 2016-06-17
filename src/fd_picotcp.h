@@ -27,6 +27,6 @@ typedef struct s_fd_elem_t {
 	struct pico_socket* socket;	/* picotcp socket */
 } fd_elem;
 
-void _print_stats();
+/*void _print_stats();
 
-void perror();
+void perror();*/

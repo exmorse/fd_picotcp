@@ -1,11 +1,19 @@
-COMPILE_PICOTCP=picotcp/build/modules/pico_dev_vde.o
+INSTALL_PATH=/usr/local
 INCLUDE_FD_PICOTCP=-I ./ 
 INCLUDE_PICOTCP=-I picotcp/build/include
 
 all: libfdpicotcp.so libfdpicotcp.a
 	rm *.o
 
-libfdpicotcp.so: fd_picotcp.o device.o fd_functions.o socket.o fd_errors.o
+install: ../shared_lib/libfdpicotcp.so
+	cp ../shared_lib/libfdpicotcp.so ${INSTALL_PATH}/lib
+	cp fd_picotcp.h fede_socket.h ${INSTALL_PATH}/include
+
+uninstall:
+	rm ${INSTALL_PATH}/lib/libfdpicotcp.so
+	rm ${INSTALL_PATH}/include/fd_picotcp.h ${INSTALL_PATH}/include/fede_socket.h
+
+libfdpicotcp.so: fd_picotcp.o device.o fd_functions.o socket.o fd_errors.o fede_socket.o
 	cp picotcp/build/lib/libpicotcp.a ./
 	ar x libpicotcp.a 
 	gcc -shared -o libfdpicotcp.so *.o -lvdeplug -ldl -lpthread 
@@ -16,7 +24,6 @@ libfdpicotcp.so: fd_picotcp.o device.o fd_functions.o socket.o fd_errors.o
 libfdpicotcp.a: fd_picotcp.o device.o fd_functions.o socket.o fd_errors.o
 	cp picotcp/build/lib/libpicotcp.a ./
 	ar x libpicotcp.a 
-	#ar rcs libfdpicotcp.a *.o $(COMPILE_PICOTCP) picotcp/build/lib/libpicotcp.a
 	ar rcs libfdpicotcp.a *.o 
 	rm libpicotcp.a
 	mkdir ../static_lib
@@ -33,6 +40,9 @@ fd_functions.o: fd_functions.c
 
 socket.o: socket.c
 	$(CC) $(CFLAGS) -c -fPIC socket.c $(INCLUDE_PICOTCP) $(INCLUDE_FD_PICOTCP) 
+
+fede_socket.o: fede_socket.c
+	$(CC) $(CFLAGS) -c -fPIC fede_socket.c $(INCLUDE_PICOTCP) $(INCLUDE_FD_PICOTCP) 
 
 fd_errors.o: fd_errors.c
 	$(CC) $(CFLAGS) -c -fPIC fd_errors.c $(INCLUDE_PICOTCP) $(INCLUDE_FD_PICOTCP) 
