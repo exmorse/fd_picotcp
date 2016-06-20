@@ -19,7 +19,12 @@ Compiling fd_picotcp:
 
 	```
 	make
-	```	
+	```
+- optionally it is possible to run (with root privilege):
+	```
+	make install
+	```
+  to move libraries and header files to standard locations
 
 
 Writing programs using fd_picotcp:
@@ -46,14 +51,16 @@ Compiling programs using fd_picotcp:
 ####Compiling with the static ```libfdpicotcp.a```:
 Run gcc with the following flags:
 
-	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/static_lib -lfdpicotcp
+	-I PATH/TO/FD_PICOTCP/src -L PATH/TO/FD_PICOTCP/static_lib -lfdpicotcp
 
 	-ldl -lpthread -lvdeplug
+	
+- There's no need to use ```-I``` and ```-L``` flags if the library is installed (```make install```)
 	
 ####Compiling with the shared ```libfdpicotcp.so```:
 Run gcc with the following flags:
 
-	-I PATH/TO/FD_PICOTCP/src -L -L PATH/TO/FD_PICOTCP/shared_lib -lfdpicotcp
+	-I PATH/TO/FD_PICOTCP/src -L PATH/TO/FD_PICOTCP/shared_lib -lfdpicotcp
 
 	-ldl -lpthread -lvdeplug
 
@@ -63,6 +70,8 @@ then add the path to the shared object to ```LD_LIBRARY_PATH``` before launching
 
 	  export LD_LIBRARY_PATH
 
+
+- There's no need to use ```-I``` and ```-L``` flags if the library is installed (```make install```)
 
 Examples:
 ---------
