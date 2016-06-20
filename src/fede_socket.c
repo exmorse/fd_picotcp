@@ -111,7 +111,7 @@ int pico_bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		if (addr_string == NULL) {
 			fd_err = FD_INVALID_ADDRESS;
 			return -1;
-		}	
+		}
 		return fd_pico_socket_bind(fd, addr_string, local->sin_port);
 	}
 	
@@ -175,24 +175,41 @@ int pico_accept (int fd, struct sockaddr* addr,
 	char str_addr[100];
 	int ret_fd = fd_pico_socket_accept(fd, str_addr, p_port);
 	
+	printf("--- Accept returned : %d ---\n", ret_fd);
+	
 	fd_elem* l = get_fd_elem_from_fd(ret_fd);
+	
+	printf("--- GOT ---\n");
 	
 	if (l == NULL) {
 		addr = NULL;
 		*addrlen = 0;
+		printf("--- Accept is going to be NULL ---\n");
 		return -1;
 	} 
 
 	/* fd_picotcp IPv4 socket */
 	if (!l->isIpv6) {
+		printf("--- IF BRANCH ---\n");
 		struct sockaddr_in* s = (struct sockaddr_in*)addr;
+		if (s == NULL) printf("--- s is NULL ---\n");
+		printf("--- sockaddr ---\n");
 		s->sin_family = AF_INET;
+		printf("--- af_inet ---\n");
 		s->sin_port = *p_port;
+		printf("--- sin_port ---\n");
 		s->sin_addr.s_addr = inet_addr(str_addr);
-		*addrlen = sizeof(*s);	
+		printf("--- s_addr ---\n");
+		*addrlen = (socklen_t)sizeof(*s);
+		printf("--- sizeof %d ---\n", (int)sizeof(*s));
+	
+		printf("--- Accept will return : %d ---\n", ret_fd);
+			
 		return ret_fd;
 	} 
 		
+	printf("--- ELSE BRANCH ---\n", ret_fd);
+	
 	/* fd_picotcp IPv6 socket */
 	if (l->isIpv6) {
 		struct sockaddr_in6* s = (struct sockaddr_in6*)addr;

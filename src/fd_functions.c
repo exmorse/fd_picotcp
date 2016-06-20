@@ -116,6 +116,8 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 			}
 		}
 
+		printf("--- BIND to Port %d ---\n", (int)port);
+		
 		return pico_socket_bind(s, &ip_address.addr, &port);
 	}
 
@@ -189,6 +191,8 @@ int fd_pico_socket_connect(int fd, char* address, uint16_t port) {
                 return -1;
         }
 
+	printf("--- CONNECT to Port %d ---\n", (int)port);
+
         /* IPv4 - picotcp connect */
 	if (!l->isIpv6) {
 		err = pico_string_to_ipv4(address, &ip_address.addr);
@@ -252,6 +256,8 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 	}
 
 	*p_port = s_port;
+	
+	printf("--- ACCEPT to Port %d ---\n", (int)s_port);
 	
 	/* Create a fd_elem structure for the accepted picotcp socket */
 	err = pipe(pipefd);
