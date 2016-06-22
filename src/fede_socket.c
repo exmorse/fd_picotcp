@@ -200,7 +200,7 @@ int pico_accept (int fd, struct sockaddr* addr,
 		printf("--- sin_port ---\n");
 		s->sin_addr.s_addr = inet_addr(str_addr);
 		printf("--- s_addr ---\n");
-		*addrlen = (socklen_t)sizeof(*s);
+		//*addrlen = (socklen_t)sizeof(*s);
 		printf("--- sizeof %d ---\n", (int)sizeof(*s));
 	
 		printf("--- Accept will return : %d ---\n", ret_fd);
