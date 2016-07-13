@@ -5,6 +5,14 @@ Fd_picotcp is a wrapper for picotcp that allows to manipulate picotcp socket (li
 vde, tap or tun devices) using the standard socket interface, and perform poll() and 
 select() simultaneously on both picotcp sockets and kernel sockets.
 
+Requirements:
+-------------
+
+- 	vde2
+- 	libvdeplug-dev
+- 	picotcp (Included)
+
+
 Compiling fd_picotcp:
 ---------------------
 
