@@ -3,7 +3,7 @@ fd_picoTCP
 
 Fd_picotcp is a wrapper for picotcp that allows to manipulate picotcp socket (linked to 
 vde, tap or tun devices) using the standard socket interface, and perform poll() and 
-select() simultaneously on picotcp sockets and kernel sockets.
+select() simultaneously on both picotcp sockets and kernel sockets.
 
 Compiling fd_picotcp:
 ---------------------
@@ -79,12 +79,12 @@ Very basic application showing how to write and compile a program with fd_picotc
 
 - move to examples/ directory
 - run ```make``` to compile the examples 
-	* the default Makefile uses the static libfdpicotcp.a library, to compile 
+	* the default Makefile uses the static libfdpicotcp.a library; to compile 
   	  with the shared libfdpicotcp.so use 
 	  
 	  ```make -f Makefile_so```
 	
-	  then run:
+	  then, if the library is not installed, run:
 	  ```	
 	  LD_LIBRARY_PATH=./PATH/TO/FDPICOTCP/shared_lib
 
