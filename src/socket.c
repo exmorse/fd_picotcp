@@ -148,40 +148,41 @@ int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 	
 	/* fd_picotcp IPv4 socket */
 	if (addrlen == sizeof(struct sockaddr_in)) {
-		struct sockaddr_in* local = (struct sockaddr_in*)addr;
-		char * addr_string = inet_ntoa(local->sin_addr);
+		struct sockaddr_in* server = (struct sockaddr_in*)addr;
+		char * addr_string = inet_ntoa(server->sin_addr);
 		if (addr_string == NULL) {
 			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}	
-		return fd_pico_socket_connect(fd, addr_string, local->sin_port);
+		return fd_pico_socket_connect(fd, addr_string, server->sin_port);
 	}
 	
 	/* fd_picotcp IPv6 socket */
 	else if (addrlen == sizeof(struct sockaddr_in6)) {
 		char addr_string[100];
-		struct sockaddr_in6* local = (struct sockaddr_in6*)addr;
-		inet_ntop(AF_INET6, &local->sin6_addr, addr_string, addrlen);
+		struct sockaddr_in6* server = (struct sockaddr_in6*)addr;
+		inet_ntop(AF_INET6, &server->sin6_addr, addr_string, addrlen);
 	
 		if (addr_string == NULL) {
 			fd_err = FD_INVALID_ADDRESS;
 			return -1;
 		}		
 		
-		return fd_pico_socket_connect(fd, addr_string, local->sin6_port);
+		return fd_pico_socket_connect(fd, addr_string, server->sin6_port);
 	}
 	
 	else return -1;
 }
 
-int accept (int fd, struct sockaddr* addr, 
-		socklen_t* addrlen) {
+int accept (int fd, struct sockaddr* addr, socklen_t* addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
 		return syscall(__NR_accept, fd, addr, addrlen);
 	}
 
 	int* p_port = (int*)malloc(sizeof(int));
 	char str_addr[100];
+
+	/* Blocking */
 	int ret_fd = fd_pico_socket_accept(fd, str_addr, p_port);
 	
 	fd_elem* l = get_fd_elem_from_fd(ret_fd);

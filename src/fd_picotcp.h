@@ -20,6 +20,7 @@
    key to identify the corresponding fd_elem 				*/
 typedef struct s_fd_elem_t {
 	int fd[2];		/* Pipe - select and poll will use this fd */     
+	int fd_write_count; 	/* Number of write on fd_socket */
 	int fd_char_count; 	/* Number of char wrote and not read on fd */
 	int isIpv6;		/* Boolean to determine if socket is IPv4 or IPv6 */
 	sem_t* accept_sem;	/* Accept-Connect semaphore */
@@ -27,6 +28,3 @@ typedef struct s_fd_elem_t {
 	struct pico_socket* socket;	/* picotcp socket */
 } fd_elem;
 
-/*void _print_stats();
-
-void perror();*/

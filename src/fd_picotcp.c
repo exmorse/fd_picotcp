@@ -165,9 +165,9 @@ void handle_wakeup(uint16_t ev, struct pico_socket* socket) {
 		/* Write a character on fd_elem pipe */
 		/* Any select or poll on this file descriptor will unlock */
 		syscall(__NR_write, l->fd[1], "a", 1);
-		l->fd_char_count++;
+		l->fd_write_count++;
 	
-		/* Unlock on reareadphore */
+		/* Unlock on read semaphore */
 		unlock_sem(l->read_sem);
 	}
 	
@@ -224,6 +224,7 @@ int fd_elem_create(int fd[2], struct pico_socket* socket) {
 		return -1;
 	}
 
+	l->fd_write_count = 0;
 	l->fd_char_count = 0;
 	l->fd[0] = fd[0];
 	l->fd[1] = fd[1];

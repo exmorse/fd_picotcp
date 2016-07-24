@@ -38,6 +38,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <sys/ioctl.h>
+
 static int thread_launched = 0;
 
 int fd_pico_socket_open(uint16_t net, uint16_t proto) {	
@@ -66,6 +68,7 @@ int fd_pico_socket_open(uint16_t net, uint16_t proto) {
 
 	/* Create new fd_picotcp socket struct, using pipe and picotcp socket */
 	new_fd = fd_elem_create(pipefd, s);
+
 	if (new_fd < 0) {
 		//fd_err = FD_TABLE_INSERT_ELEMENT;
 		return -1;
@@ -116,8 +119,6 @@ int fd_pico_socket_bind(int fd, char* address, uint16_t port) {
 			}
 		}
 
-		printf("--- BIND to Port %d ---\n", (int)port);
-		
 		return pico_socket_bind(s, &ip_address.addr, &port);
 	}
 
@@ -191,8 +192,6 @@ int fd_pico_socket_connect(int fd, char* address, uint16_t port) {
                 return -1;
         }
 
-	printf("--- CONNECT to Port %d ---\n", (int)port);
-
         /* IPv4 - picotcp connect */
 	if (!l->isIpv6) {
 		err = pico_string_to_ipv4(address, &ip_address.addr);
@@ -257,8 +256,6 @@ int fd_pico_socket_accept(int fd, char* str_addr, int* p_port) {
 
 	*p_port = s_port;
 	
-	printf("--- ACCEPT to Port %d ---\n", (int)s_port);
-	
 	/* Create a fd_elem structure for the accepted picotcp socket */
 	err = pipe(pipefd);
 	new_fd = fd_elem_create(pipefd, c);
@@ -304,13 +301,22 @@ int fd_pico_socket_read(int fd, char* buffer, int len) {
 	char b[10];
 	
 	/* Read chars from the fd_elem pipe until it is empty */
-	while (l->fd_char_count > 0) {
+	while (l->fd_write_count > 0) {
 		n = syscall(__NR_read, l->fd[0], b, 10); 
-		l->fd_char_count -= n;
+		l->fd_write_count -= n;
 	}
 
-	return pico_socket_read(l->socket, buffer, len);
+	int read_len = pico_socket_read(l->socket, buffer, len);
+		
+	printf("Char Count: %d, Letto %d\n", l->fd_char_count, read_len);
+	
+	l->fd_char_count -= read_len;
 
+	if (len == read_len) {	
+		unlock_sem(l->read_sem);
+	}
+
+	return read_len;
 }
 
 int fd_pico_socket_close(int fd) {

@@ -208,8 +208,6 @@ int pico_accept (int fd, struct sockaddr* addr,
 		return ret_fd;
 	} 
 		
-	printf("--- ELSE BRANCH ---\n", ret_fd);
-	
 	/* fd_picotcp IPv6 socket */
 	if (l->isIpv6) {
 		struct sockaddr_in6* s = (struct sockaddr_in6*)addr;
