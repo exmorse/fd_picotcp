@@ -39,19 +39,24 @@ Writing programs using fd_picotcp:
 ---------------------------------
 
 - include ```<fd_picotcp.h>```
-
-- customize device (vde, tap or tun) and environment using ```set_device_type()```, ```set_device_mac()```,
-  ```set_interface_name()```, ```set_switch_path()```,  ```set_ipv4_netmask()```, and ```set_ipv6_netmask()``` 
-  before creating any fd_picotcp  sockets 
-  (NOT NECESSARY, default values are set)
-
 - create fd_picotcp sockets using ```socket()```, with  ```AF_PICO_INET``` or ```AF_PICO_INET6```
   as first argument
   * If ```socket()``` is called with any other first argument the ```socket()``` system
     call is executed
-
 - now it is possible to perform the standard socket operations on the file 
   descriptor returned by ```socket()```
+
+####Customize Device  
+Before creating the first socket, it is possible to customize the environment.
+These operations are not necessary, since there are default values for the corresponding parameters.
+
+- ```set_device_type(int type)```, where ```DEVICE_VDE```, ```DEVICE_TAP``` and ```DEVICE_TUN``` are the possible values, and ```DEVICE_VDE``` the default one
+- ```set_device_mac(unsigned char mac[6])```, where the default is a randomly generated MAC
+- ```set_switch_path(char* path)```, with ```/tmp/vde.ctl``` as the default value 
+- ```set_interface_name(char* name)```, to set tap or tun interface name
+- ```set_ipv4_netmask(char* new_mask)```, with the mask given in string format (e.g. ```255.255.255.0```)
+- ```set_ipv6_netmask(char* new_mask)```, with the mask given in string format (e.g. ```ffff::```)   
+
 
 
 Compiling programs using fd_picotcp:
