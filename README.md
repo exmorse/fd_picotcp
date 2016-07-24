@@ -108,7 +108,7 @@ Very basic application showing how to write and compile a program with fd_picotc
 
 - launch the client:
 	```
-	./fd_client <IPv4_Address> <IPv4_Server_address> <Server_Port>
+	./fd_client <IPv4_Address> <IPv4_Server_Address> <Server_Port>
 	example:	./fd_client 10.0.0.2 10.0.0.1 5000
 	```
 	
