@@ -17,7 +17,7 @@ Compiling fd_picotcp:
 ---------------------
 
 - move to src/picotcp 
-- run: 	
+- if you do not have picoTcp on you machine run: 	
  	```
 	make posix core ARCH=shared
 	
@@ -28,6 +28,11 @@ Compiling fd_picotcp:
 	```
 	make
 	```
+	
+	* or if you already had picoTcp:
+	```make PICOTCP_PATH=PATH/TO/PICOTCP/build/include```  
+
+
 - optionally it is possible to run (with root privilege):
 	```
 	make install
