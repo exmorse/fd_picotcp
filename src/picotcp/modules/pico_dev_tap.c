@@ -94,7 +94,7 @@ static int tap_open(char *name)
     }
 
     memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags = IFF_TAP | IFF_NO_PI | IFF_MULTI_QUEUE;
+    ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     strncpy(ifr.ifr_name, name, IFNAMSIZ);
     if(ioctl(tap_fd, TUNSETIFF, &ifr) < 0) {
         dbg("Error setting ioctl\n");
