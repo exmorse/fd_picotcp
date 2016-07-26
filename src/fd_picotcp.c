@@ -118,6 +118,7 @@ void init() {
 			break;
 	
 		case DEVICE_TAP:
+			printf("Trying to create device linked to %s\n", vde_switch_name);
 			pico_dev = (struct pico_device*) pico_tap_create(vde_switch_name);
 			break;
 	

@@ -308,10 +308,6 @@ int fd_pico_socket_read(int fd, char* buffer, int len) {
 
 	int read_len = pico_socket_read(l->socket, buffer, len);
 		
-	printf("Char Count: %d, Letto %d\n", l->fd_char_count, read_len);
-	
-	l->fd_char_count -= read_len;
-
 	if (len == read_len) {	
 		unlock_sem(l->read_sem);
 	}

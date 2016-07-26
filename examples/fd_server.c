@@ -30,8 +30,8 @@ int main(int argc, char* argv[]) {
 	local.sin_port = htons(atoi(argv[2]));
 	local.sin_addr.s_addr = inet_addr(argv[1]);
 
-	set_device_type(DEVICE_TAP);
-	set_interface_name("tap0");
+	//set_device_type(DEVICE_TAP);
+	//set_interface_name("test_tap3");
 
 	sfd1 = socket(AF_PICO_INET, SOCK_STREAM, 0);
 	if (sfd1 == -1) {
@@ -67,6 +67,9 @@ int main(int argc, char* argv[]) {
 
 	while(1) {
 		n = read(cfd1, buffer, 100);
+
+		if (n == 0) continue;
+
 		buffer[n] = 0;
 		printf("[fd_socket]%s (%d chars)\n", buffer, n);
 	}

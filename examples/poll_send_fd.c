@@ -20,32 +20,22 @@ int main(int argc, char* argv[]) {
 
 	struct sockaddr_in local, server;
 
-	if (argc != 4) {
-		printf("USAGE: %s <MY_IP> <SERVER_IP> <SERVER_PORT>\n", argv[0]);
-		return -1;
-	}
-
-	//set_device_type(DEVICE_TAP);
-	//set_interface_name("test_tap2");
-
 	cfd = socket(AF_PICO_INET, SOCK_STREAM, 0);
 
 	local.sin_family = AF_INET;
 	local.sin_port = htons(5000);
-	local.sin_addr.s_addr = inet_addr(argv[1]);
+	local.sin_addr.s_addr = inet_addr("10.0.0.200");
 	err = bind(cfd, (struct sockaddr*)&local, sizeof(local));
 	if (err == -1) {
 		printf("BIND ERROR\n");
-		return -1;
 	}
 
 	server.sin_family = AF_INET;
-	server.sin_port = htons(atoi(argv[3]));
-	server.sin_addr.s_addr = inet_addr(argv[2]);
+	server.sin_port = htons(5000);
+	server.sin_addr.s_addr = inet_addr("10.0.0.100");
 	err = connect(cfd, (struct sockaddr*)&server, sizeof(server));
 	if (err == -1) {
 		printf("CONNECT ERROR\n");
-		return -1;
 	}
 
 	while(1) {

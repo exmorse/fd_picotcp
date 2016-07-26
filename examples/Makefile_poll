@@ -1,0 +1,16 @@
+INCLUDE_FD_PICOTCP=-I ../src -L ../static_lib -lfdpicotcp
+LINK_FLAGS=-ldl -lpthread -lvdeplug
+
+all: poll_wait poll_send_fd poll_send_kernel 
+
+poll_wait: poll_wait.c  
+	$(CC) $(CFLAGS) -rdynamic -o poll_wait poll_wait.c $(INCLUDE_FD_PICOTCP) $(INCLUDE_PICOTCP) $(LINK_FLAGS) 
+
+poll_send_fd: poll_send_fd.c  
+	$(CC) $(CFLAGS) -rdynamic -o poll_send_fd poll_send_fd.c $(INCLUDE_FD_PICOTCP) $(INCLUDE_PICOTCP) $(LINK_FLAGS) 
+
+poll_send_kernel: poll_send_kernel.c  
+	$(CC) $(CFLAGS) -rdynamic -o poll_send_kernel poll_send_kernel.c 
+
+clean:
+	rm poll_wait poll_send_fd poll_send_kernel

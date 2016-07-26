@@ -1,4 +1,4 @@
-INCLUDE_FD_PICOTCP=-I ../src -L ../static_lib -lfdpicotcp
+INCLUDE_FD_PICOTCP=-I ../src -L ../shared_lib -lfdpicotcp
 LINK_FLAGS=-ldl -lpthread -lvdeplug
 
 all: fd_server fd_client fd_server6 fd_client6 
