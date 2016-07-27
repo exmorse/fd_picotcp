@@ -27,7 +27,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-
+#include <linux/net.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -61,7 +61,12 @@ int pico_listen(int fd, int backlog) {
 		return fd_pico_socket_listen(fd, backlog);
 	}
 	
-	return syscall(__NR_listen, fd, backlog);
+	#ifdef __NR_listen
+        return syscall(__NR_listen, fd, backlog);
+        #else
+        unsigned long args[2] = {fd, backlog};
+        return syscall(__NR_socketcall, SYS_LISTEN, fd, backlog);
+        #endif
 }
 
 int pico_close(int fd) {
@@ -96,12 +101,24 @@ int pico_socket(int domain, int type, int protocol) {
 	}
 	
 	/* Kernel stack socket */
-	return syscall(__NR_socket, domain, type, protocol);
+	#ifdef __NR_socket
+        return syscall(__NR_socket, domain, type, protocol);
+        #else
+        unsigned long args[3] = {domain, type, protocol};
+        return syscall(__NR_socketcall, SYS_SOCKET, args);
+        #endif
+
 }
 
 int pico_bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
-		return syscall(__NR_bind, fd, addr, addrlen);
+		#ifdef __NR_bind
+                return syscall(__NR_bind, fd, addr, addrlen);
+                #else
+                unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
+                return syscall(__NR_socketcall, SYS_BIND, args);
+                #endif
+
 	}
 
 	/* fd_picotcp IPv4 socket */
@@ -134,7 +151,12 @@ int pico_bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 
 int pico_connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
-		return syscall(__NR_connect, fd, addr, addrlen);
+		#ifdef __NR_connect
+                return syscall(__NR_connect, fd, addr, addrlen);
+                #else
+                unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
+                return syscall(__NR_socketcall, SYS_CONNECT, args);
+                #endif
 	}
 	
 	/* fd_picotcp IPv4 socket */
@@ -168,7 +190,13 @@ int pico_connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 int pico_accept (int fd, struct sockaddr* addr, 
 		socklen_t* addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
-		return syscall(__NR_accept, fd, addr, addrlen);
+		#ifdef __NR_accept
+                return syscall(__NR_accept, fd, addr, addrlen);
+                #else
+                unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
+                return syscall(__NR_socketcall, SYS_ACCEPT, args);
+                #endif
+
 	}
 
 	int* p_port = (int*)malloc(sizeof(int));

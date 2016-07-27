@@ -68,15 +68,15 @@ ssize_t write(int fd, const void* buf, size_t count) {
 
 int listen(int fd, int backlog) {
 	if (get_socket_from_fd(fd) != NULL) {
-		#ifdef __NR_listen
 		return fd_pico_socket_listen(fd, backlog);
-		#else
-		unsigned long args[2] = {fd, backlog};
-		return syscall(__NR_socketcall, SYS_LISTEN, fd, backlog);
-		#endif
 	}
 	
+	#ifdef __NR_listen
 	return syscall(__NR_listen, fd, backlog);
+	#else
+	unsigned long args[2] = {fd, backlog};
+	return syscall(__NR_socketcall, SYS_LISTEN, fd, backlog);
+	#endif
 }
 
 int close(int fd) {
@@ -124,7 +124,7 @@ int bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		#ifdef __NR_bind
 		return syscall(__NR_bind, fd, addr, addrlen);
 		#else
-		unsigned long args[3] = {fd, addr, addrlen};
+		unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
 		return syscall(__NR_socketcall, SYS_BIND, args);
 		#endif
 	}
@@ -162,7 +162,7 @@ int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 		#ifdef __NR_connect
 		return syscall(__NR_connect, fd, addr, addrlen);
 		#else
-		unsigned long args[3] = {fd, addr, addrlen};
+		unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
 		return syscall(__NR_socketcall, SYS_CONNECT, args);
 		#endif
 	}
@@ -200,7 +200,7 @@ int accept (int fd, struct sockaddr* addr, socklen_t* addrlen) {
 		#ifdef __NR_accept
 		return syscall(__NR_accept, fd, addr, addrlen);
 		#else
-		unsigned long args[3] = {fd, addr, addrlen};
+		unsigned long args[3] = {fd, (unsigned long)addr, addrlen};
 		return syscall(__NR_socketcall, SYS_ACCEPT, args);
 		#endif
 	}
