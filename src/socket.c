@@ -36,6 +36,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <linux/net.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -67,7 +68,12 @@ ssize_t write(int fd, const void* buf, size_t count) {
 
 int listen(int fd, int backlog) {
 	if (get_socket_from_fd(fd) != NULL) {
+		#ifdef __NR_listen
 		return fd_pico_socket_listen(fd, backlog);
+		#else
+		unsigned long args[2] = {fd, backlog};
+		return syscall(__NR_socketcall, SYS_LISTEN, fd, backlog);
+		#endif
 	}
 	
 	return syscall(__NR_listen, fd, backlog);
@@ -83,7 +89,7 @@ int close(int fd) {
 
 /* The socket file descriptor is returned */
 int socket(int domain, int type, int protocol) {
-	
+
 	/* fd_picotcp IPv4 socket */
 	if (domain == AF_PICO_INET) {
 		if (type == SOCK_STREAM)
@@ -105,12 +111,22 @@ int socket(int domain, int type, int protocol) {
 	}
 	
 	/* Kernel stack socket */
+	#ifdef __NR_socket
 	return syscall(__NR_socket, domain, type, protocol);
+	#else
+	unsigned long args[3] = {domain, type, protocol};
+	return syscall(__NR_socketcall, SYS_SOCKET, args);
+	#endif
 }
 
 int bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
+		#ifdef __NR_bind
 		return syscall(__NR_bind, fd, addr, addrlen);
+		#else
+		unsigned long args[3] = {fd, addr, addrlen};
+		return syscall(__NR_socketcall, SYS_BIND, args);
+		#endif
 	}
 
 	/* fd_picotcp IPv4 socket */
@@ -143,7 +159,12 @@ int bind(int fd, const struct sockaddr* addr, socklen_t addrlen) {
 
 int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
+		#ifdef __NR_connect
 		return syscall(__NR_connect, fd, addr, addrlen);
+		#else
+		unsigned long args[3] = {fd, addr, addrlen};
+		return syscall(__NR_socketcall, SYS_CONNECT, args);
+		#endif
 	}
 	
 	/* fd_picotcp IPv4 socket */
@@ -176,7 +197,12 @@ int connect (int fd, const struct sockaddr* addr, socklen_t addrlen) {
 
 int accept (int fd, struct sockaddr* addr, socklen_t* addrlen) {
 	if (get_socket_from_fd(fd) == NULL) {
+		#ifdef __NR_accept
 		return syscall(__NR_accept, fd, addr, addrlen);
+		#else
+		unsigned long args[3] = {fd, addr, addrlen};
+		return syscall(__NR_socketcall, SYS_ACCEPT, args);
+		#endif
 	}
 
 	int* p_port = (int*)malloc(sizeof(int));
